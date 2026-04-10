@@ -1,0 +1,11 @@
+<svg width="500" height="80" viewBox="0 0 500 80" xmlns="http://www.w3.org/2000/svg">
+  <!-- athen.studio logo - Transparent background (for light backgrounds) -->
+  <g transform="translate(30, 10)">
+    <!-- Architectural A with extended crossbar -->
+    <path d="M0 60 L30 0" fill="none" stroke="#1A1A1A" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M30 0 L60 60" fill="none" stroke="#1A1A1A" stroke-width="1.8" stroke-linecap="round"/>
+    <line x1="10" y1="42" x2="78" y2="42" stroke="#B8A89A" stroke-width="1.8" stroke-linecap="round"/>
+    <!-- Wordmark -->
+    <text x="86" y="52" font-family="Helvetica, Arial, sans-serif" font-size="36" font-weight="300" fill="#1A1A1A" letter-spacing="1">athen.studio</text>
+  </g>
+</svg>
