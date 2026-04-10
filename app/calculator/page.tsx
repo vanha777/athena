@@ -42,9 +42,6 @@ const D = {
   numDwellings: 2,
   contingency: 10,
   provisionalSums: 15000,
-  planningPermits: 8000,
-  designFees: 18000,
-  surveying: 4500,
   councilContributions: 12000,
   utilityConnections: 8000,
   loanLvr: 65,
@@ -71,11 +68,14 @@ const D = {
   tpPermitFee: 1800,
   subdivisionAppFee: 1496,
   certificationFee: 198,
+  openSpacePct: 3.0,
   conveyancing: 3000,
   soilTest: 900,
   structEngineering: 6000,
   civilEngineering: 5000,
   energyRating: 1200,
+  constructionDrawings: 10000,
+  specifications: 2500,
   buildingPermit: 4500,
 };
 
@@ -158,10 +158,8 @@ export default function CalculatorPage() {
     
     const cont = build * ((isNaN(p.contingency) ? 0 : p.contingency) / 100);
     const conTotal = build + cont + (isNaN(p.provisionalSums) ? 0 : p.provisionalSums);
-    const soft = (isNaN(p.planningPermits) ? 0 : p.planningPermits) + 
-                 (isNaN(p.designFees) ? 0 : p.designFees) + 
-                 (isNaN(p.surveying) ? 0 : p.surveying) + 
-                 (isNaN(p.councilContributions) ? 0 : p.councilContributions) + 
+    const openSpaceFee = (isNaN(p.purchasePrice) ? 0 : p.purchasePrice) * ((isNaN(p.openSpacePct) ? 0 : p.openSpacePct) / 100);
+    const soft = (isNaN(p.councilContributions) ? 0 : p.councilContributions) + 
                  (isNaN(p.utilityConnections) ? 0 : p.utilityConnections) +
                  (isNaN(p.surveyFeature) ? 0 : p.surveyFeature) +
                  (isNaN(p.surveyReestab) ? 0 : p.surveyReestab) +
@@ -170,11 +168,14 @@ export default function CalculatorPage() {
                  (isNaN(p.tpPermitFee) ? 0 : p.tpPermitFee) +
                  (isNaN(p.subdivisionAppFee) ? 0 : p.subdivisionAppFee) +
                  (isNaN(p.certificationFee) ? 0 : p.certificationFee) +
+                 openSpaceFee +
                  (isNaN(p.conveyancing) ? 0 : p.conveyancing) +
                  (isNaN(p.soilTest) ? 0 : p.soilTest) +
                  (isNaN(p.structEngineering) ? 0 : p.structEngineering) +
                  (isNaN(p.civilEngineering) ? 0 : p.civilEngineering) +
                  (isNaN(p.energyRating) ? 0 : p.energyRating) +
+                 (isNaN(p.constructionDrawings) ? 0 : p.constructionDrawings) +
+                 (isNaN(p.specifications) ? 0 : p.specifications) +
                  (isNaN(p.buildingPermit) ? 0 : p.buildingPermit);
     const loanBase = acq + conTotal + soft;
     const loan = loanBase * ((isNaN(p.loanLvr) ? 0 : p.loanLvr) / 100);
@@ -284,22 +285,31 @@ export default function CalculatorPage() {
       </Sec>
 
       <Sec id="soft" title="Soft Costs" sum={$(res.soft)} isOpen={openS.soft} onToggle={() => tog("soft")}>
-        <div className="px-4 py-2 bg-surface-container-low/50 text-[10px] font-bold text-on-surface-variant uppercase tracking-widest border-b border-outline-variant/10">Surveying & Planning</div>
-        <FR label="Feature Survey"><NI val={inp.surveyFeature} onChange={v => set("surveyFeature", v)} step={100} pre="$" /></FR>
-        <FR label="Re-establishment"><NI val={inp.surveyReestab} onChange={v => set("surveyReestab", v)} step={100} pre="$" /></FR>
-        <FR label="Town Planning Docs"><NI val={inp.tpDrawings} onChange={v => set("tpDrawings", v)} step={500} pre="$" /></FR>
-        <FR label="Planning Report"><NI val={inp.tpReport} onChange={v => set("tpReport", v)} step={500} pre="$" /></FR>
+        <div className="px-4 py-2 bg-surface-container-low/50 text-[10px] font-bold text-on-surface-variant uppercase tracking-widest border-b border-outline-variant/10">1. Surveying & Planning</div>
+        <FR label="Feature Survey" sub="Levels, trees, neighbors"><NI val={inp.surveyFeature} onChange={v => set("surveyFeature", v)} step={100} pre="$" /></FR>
+        <FR label="Re-establishment" sub="Boundary definition"><NI val={inp.surveyReestab} onChange={v => set("surveyReestab", v)} step={100} pre="$" /></FR>
+        <FR label="Town Planning Docs" sub="Plans, elevations, shadows"><NI val={inp.tpDrawings} onChange={v => set("tpDrawings", v)} step={500} pre="$" /></FR>
+        <FR label="Town Planning Report" sub="Statement of Env. Effects"><NI val={inp.tpReport} onChange={v => set("tpReport", v)} step={500} pre="$" /></FR>
         
-        <div className="px-4 py-2 bg-surface-container-low/50 text-[10px] font-bold text-on-surface-variant uppercase tracking-widest border-y border-outline-variant/10">Statutory & Permitting</div>
-        <FR label="TP Permit Fee"><NI val={inp.tpPermitFee} onChange={v => set("tpPermitFee", v)} step={100} pre="$" /></FR>
-        <FR label="Subdivision Application"><NI val={inp.subdivisionAppFee} onChange={v => set("subdivisionAppFee", v)} step={50} pre="$" /></FR>
-        <FR label="Council contributions" sub="DCP/S801"><NI val={inp.councilContributions} onChange={v => set("councilContributions", v)} step={1000} pre="$" /></FR>
+        <div className="px-4 py-2 bg-surface-container-low/50 text-[10px] font-bold text-on-surface-variant uppercase tracking-widest border-y border-outline-variant/10">2. Permits & Statutory</div>
+        <FR label="TP Permit Fee" sub="Council application"><NI val={inp.tpPermitFee} onChange={v => set("tpPermitFee", v)} step={100} pre="$" /></FR>
+        <FR label="Subdivision Application" sub="Council fee (2 lots)"><NI val={inp.subdivisionAppFee} onChange={v => set("subdivisionAppFee", v)} step={50} pre="$" /></FR>
+        <FR label="Certification of Plan" sub="Subdivision certification"><NI val={inp.certificationFee} onChange={v => set("certificationFee", v)} step={10} pre="$" /></FR>
+        <FR label="Open Space Contrib. (%)" sub="Linked to site value"><NI val={inp.openSpacePct} onChange={v => set("openSpacePct", v)} step={0.1} suf="%" /></FR>
+        <FR label="Conveyancing / Legals" sub="Section 173, registration"><NI val={inp.conveyancing} onChange={v => set("conveyancing", v)} step={100} pre="$" /></FR>
+        <FR label="Council contributions" sub="DCP / Infrastructure"><NI val={inp.councilContributions} onChange={v => set("councilContributions", v)} step={1000} pre="$" /></FR>
 
-        <div className="px-4 py-2 bg-surface-container-low/50 text-[10px] font-bold text-on-surface-variant uppercase tracking-widest border-y border-outline-variant/10">Engineering & Tech</div>
-        <FR label="Soil / Geotech"><NI val={inp.soilTest} onChange={v => set("soilTest", v)} step={50} pre="$" /></FR>
-        <FR label="Structural Engineering"><NI val={inp.structEngineering} onChange={v => set("structEngineering", v)} step={500} pre="$" /></FR>
-        <FR label="Civil / Drainage"><NI val={inp.civilEngineering} onChange={v => set("civilEngineering", v)} step={500} pre="$" /></FR>
-        <FR label="Utility connections"><NI val={inp.utilityConnections} onChange={v => set("utilityConnections", v)} step={500} pre="$" /></FR>
+        <div className="px-4 py-2 bg-surface-container-low/50 text-[10px] font-bold text-on-surface-variant uppercase tracking-widest border-y border-outline-variant/10">3. Engineering & Tech</div>
+        <FR label="Soil / Geotechnical" sub="Foundation design report"><NI val={inp.soilTest} onChange={v => set("soilTest", v)} step={50} pre="$" /></FR>
+        <FR label="Structural Engineering" sub="Slabs, steel, framing"><NI val={inp.structEngineering} onChange={v => set("structEngineering", v)} step={500} pre="$" /></FR>
+        <FR label="Civil / Drainage / LMP" sub="Stormwater & OSD design"><NI val={inp.civilEngineering} onChange={v => set("civilEngineering", v)} step={500} pre="$" /></FR>
+        <FR label="Energy Rating" sub="NatHERS / BESS (7-star)"><NI val={inp.energyRating} onChange={v => set("energyRating", v)} step={50} pre="$" /></FR>
+        <FR label="Utility connections" sub="Water, sewer, power tapping"><NI val={inp.utilityConnections} onChange={v => set("utilityConnections", v)} step={500} pre="$" /></FR>
+
+        <div className="px-4 py-2 bg-surface-container-low/50 text-[10px] font-bold text-on-surface-variant uppercase tracking-widest border-y border-outline-variant/10">4. Construction Documentation</div>
+        <FR label="Construction Drawings" sub="Detailed 1:50 blueprints"><NI val={inp.constructionDrawings} onChange={v => set("constructionDrawings", v)} step={500} pre="$" /></FR>
+        <FR label="Schedule of Finishes" sub="Specs for tender package"><NI val={inp.specifications} onChange={v => set("specifications", v)} step={500} pre="$" /></FR>
+        <FR label="Building Permit" sub="Surveyor fee & inspections"><NI val={inp.buildingPermit} onChange={v => set("buildingPermit", v)} step={500} pre="$" /></FR>
       </Sec>
 
       <Sec id="fin" title="Finance" sum={$(res.fin)} isOpen={openS.fin} onToggle={() => tog("fin")}>
